@@ -1,0 +1,22 @@
+{
+  "name": "lagbe-kichu-ecommerce",
+  "version": "1.0.0",
+  "description": "Full-stack e-commerce platform with Admin, Seller, and Buyer roles",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "ecommerce",
+    "fullstack",
+    "nextjs",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC"
+}
+

@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+
+# Environment Variables
+# Ignore actual .env files but keep .env.example files (required for submission)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Explicitly allow .env.example files (REQUIRED FOR SUBMISSION)
+!.env.example
+!.env.local.example
+!backend/.env.example
+!frontend/.env.local.example
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories
+.idea/
+.vscode/
+*.code-workspace
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js
+.next/
+out/
+
+# Backend
+backend/dist/
+backend/.env
+backend/uploads/
+# Allow backend/.env.example (required for submission)
+!backend/.env.example
+
+# Frontend
+frontend/.next/
+frontend/out/
+frontend/.env.local
+# Allow frontend/.env.local.example (required for submission)
+!frontend/.env.local.example
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
