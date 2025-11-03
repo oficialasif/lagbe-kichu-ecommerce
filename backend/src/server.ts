@@ -103,6 +103,21 @@ mongoose.connection.on('error', (err) => {
   logger.error('MongoDB error:', err);
 });
 
+app.get('/', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Lagbe Kichu API is running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      products: '/api/products',
+      categories: '/api/categories',
+      orders: '/api/orders'
+    }
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
