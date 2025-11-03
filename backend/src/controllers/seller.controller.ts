@@ -278,9 +278,10 @@ export const createProduct = async (
       } else {
         logger.debug('Using local file storage');
         const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-        images.push(...req.files
-          .filter((file: Express.Multer.File) => file.mimetype.startsWith('image/'))
-          .map((file: Express.Multer.File) => {
+        const fileArray = Array.isArray(req.files) ? req.files : [];
+        images.push(...fileArray
+          .filter((file) => file.mimetype.startsWith('image/'))
+          .map((file) => {
             const filename = path.basename(file.path);
             const url = `${baseUrl}/uploads/${filename}`;
             return url;
@@ -295,7 +296,7 @@ export const createProduct = async (
 
     let video: string | undefined = undefined;
     if (req.files && Array.isArray(req.files)) {
-      const videoFile = req.files.find((file: Express.Multer.File) => 
+      const videoFile = req.files.find((file) => 
         file.mimetype.startsWith('video/')
       );
       
@@ -409,15 +410,15 @@ export const updateProduct = async (
     // Handle file uploads
     if (req.files && Array.isArray(req.files)) {
       const newImages = req.files
-        .filter((file: Express.Multer.File) => file.mimetype.startsWith('image/'))
-        .map((file: Express.Multer.File) => file.path);
+        .filter((file) => file.mimetype.startsWith('image/'))
+        .map((file) => file.path);
       
       product.images = [...product.images, ...newImages];
     }
 
     // Handle video upload
     const video = Array.isArray(req.files) 
-      ? req.files.find((file: Express.Multer.File) => 
+      ? req.files.find((file) => 
           file.mimetype.startsWith('video/')
         )?.path
       : undefined;
