@@ -10,16 +10,18 @@ import Link from 'next/link'
 
 export default function SellerOrdersPage() {
   const router = useRouter()
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
+  const { user, isAuthenticated, isInitializing } = useAppSelector((state) => state.auth)
   const [page, setPage] = useState(1)
   const { data, isLoading } = useGetSellerOrdersQuery({ page, limit: 10 })
   const [updateStatus] = useUpdateOrderStatusMutation()
 
   useEffect(() => {
+    if (isInitializing) return
+    
     if (!isAuthenticated || user?.role !== 'seller') {
       router.push('/auth/login')
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, user, isInitializing, router])
 
   const handleStatusUpdate = async (orderId: string, status: string) => {
     try {
@@ -27,6 +29,14 @@ export default function SellerOrdersPage() {
     } catch (error) {
       alert('Failed to update order status')
     }
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+        <p className="text-white/70">Loading...</p>
+      </div>
+    )
   }
 
   if (!isAuthenticated || user?.role !== 'seller') {

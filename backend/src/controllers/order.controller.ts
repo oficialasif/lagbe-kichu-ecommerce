@@ -80,7 +80,7 @@ export const createOrder = async (
 
     const populatedOrder = await Order.findById(order._id)
       .populate('seller', 'name email phone')
-      .populate('buyer', 'name email')
+      .populate('buyer', 'name email phone')
       .populate('items.product', 'title images price');
 
     try {
@@ -92,6 +92,7 @@ export const createOrder = async (
           price: item.price,
         }));
 
+        // Send email notification
         await sendOrderConfirmationEmail(
           buyer.email,
           buyer.name || 'Customer',

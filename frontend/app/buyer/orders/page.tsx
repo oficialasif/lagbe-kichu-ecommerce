@@ -10,14 +10,24 @@ import Link from 'next/link'
 
 export default function BuyerOrdersPage() {
   const router = useRouter()
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
+  const { user, isAuthenticated, isInitializing } = useAppSelector((state) => state.auth)
   const { data, isLoading } = useGetBuyerOrdersQuery({ page: 1, limit: 10 })
 
   useEffect(() => {
+    if (isInitializing) return
+    
     if (!isAuthenticated || user?.role !== 'buyer') {
       router.push('/auth/login')
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, user, isInitializing, router])
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+        <p className="text-white/70">Loading...</p>
+      </div>
+    )
+  }
 
   if (!isAuthenticated || user?.role !== 'buyer') {
     return null

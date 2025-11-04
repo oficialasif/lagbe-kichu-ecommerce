@@ -541,7 +541,7 @@ export const updateOrderStatus = async (
     const validatedData = updateOrderStatusSchema.parse(req.body);
 
     const order = await Order.findById(orderId)
-      .populate('buyer', 'name email')
+      .populate('buyer', 'name email phone')
       .populate('items.product', 'title images price');
     
     if (!order) {

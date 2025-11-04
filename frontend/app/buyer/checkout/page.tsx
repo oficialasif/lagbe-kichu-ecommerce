@@ -138,17 +138,17 @@ export default function CheckoutPage() {
         paymentMethod: data.paymentMethod,
       }).unwrap()
 
-      if (result.success) {
+      if (result.success && result.data?.order?._id) {
         // Remove only ordered items from cart (not all items)
         checkoutItems.forEach((item) => {
           dispatch(removeFromCart(item.product._id))
         })
         // Show success message
         showToast('Order placed successfully! Redirecting...', 'success')
-        // Redirect to order details after a brief delay
-        setTimeout(() => {
-          router.push(`/buyer/orders/${result.data.order._id}`)
-        }, 1500)
+        // Redirect immediately to prevent loading state issues
+        router.push(`/buyer/orders/${result.data.order._id}`)
+      } else {
+        showToast('Order placed but received unexpected response', 'error')
       }
     } catch (error: any) {
       showToast(error?.data?.message || 'Failed to create order', 'error')

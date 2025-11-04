@@ -14,6 +14,12 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
+      // Allow images from Render backend (for production)
+      {
+        protocol: 'https',
+        hostname: '*.onrender.com',
+        pathname: '/uploads/**',
+      },
     ],
   },
   webpack: (config, { dev, isServer }) => {

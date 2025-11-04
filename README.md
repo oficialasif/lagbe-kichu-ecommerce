@@ -288,6 +288,9 @@ npm start
 - Verify Gmail App Password (not regular password)
 - Check email service configuration
 - Ensure 2-Step Verification is enabled on Gmail account
+- Check that EMAIL_USER matches your Gmail address (asifmahmud053@gmail.com)
+- Verify EMAIL_HOST is set to smtp.gmail.com
+- Check backend logs for email sending errors
 
 ## Additional Notes
 

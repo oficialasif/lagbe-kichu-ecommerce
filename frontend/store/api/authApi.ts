@@ -37,6 +37,7 @@ export const authApi = createApi({
         url: '/auth/logout',
         method: 'POST',
       }),
+      invalidatesTags: ['User'],
     }),
     getCurrentUser: builder.query({
       query: () => '/auth/me',

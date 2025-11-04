@@ -34,12 +34,21 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await logoutApi({}).unwrap()
+      // Close dropdown first
+      setShowDropdown(false)
+      // Clear logout state immediately (before API call)
       dispatch(logout())
-      router.push('/')
+      // Call logout API (but don't wait for it)
+      logoutApi({}).catch(() => {
+        // Ignore errors - we've already cleared local state
+      })
+      // Force a full page reload to clear all state
+      window.location.href = '/'
     } catch (error) {
+      // Even if something fails, clear local state and reload
       dispatch(logout())
-      router.push('/')
+      setShowDropdown(false)
+      window.location.href = '/'
     }
   }
 

@@ -21,9 +21,42 @@ interface CartState {
   selectedItems: string[] // Array of product IDs that are selected
 }
 
-const initialState: CartState = {
-  items: [],
-  selectedItems: [],
+// Load cart from localStorage on initialization
+const loadCartFromStorage = (): CartState => {
+  if (typeof window === 'undefined') {
+    return { items: [], selectedItems: [] }
+  }
+  
+  try {
+    const savedCart = localStorage.getItem('cart')
+    if (savedCart) {
+      const parsed = JSON.parse(savedCart)
+      return {
+        items: parsed.items || [],
+        selectedItems: parsed.selectedItems || [],
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load cart from localStorage:', error)
+  }
+  
+  return { items: [], selectedItems: [] }
+}
+
+const initialState: CartState = loadCartFromStorage()
+
+// Save cart to localStorage whenever it changes
+const saveCartToStorage = (state: CartState) => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    localStorage.setItem('cart', JSON.stringify({
+      items: state.items,
+      selectedItems: state.selectedItems,
+    }))
+  } catch (error) {
+    console.error('Failed to save cart to localStorage:', error)
+  }
 }
 
 const cartSlice = createSlice({
@@ -40,6 +73,7 @@ const cartSlice = createSlice({
       } else {
         state.items.push(action.payload)
       }
+      saveCartToStorage(state)
     },
     removeFromCart: (state, action: PayloadAction<string>) => {
       const productId = action.payload
@@ -50,6 +84,7 @@ const cartSlice = createSlice({
       state.selectedItems = state.selectedItems.filter(
         (id) => id !== productId
       )
+      saveCartToStorage(state)
     },
     updateQuantity: (
       state,
@@ -67,10 +102,12 @@ const cartSlice = createSlice({
           item.quantity = action.payload.quantity
         }
       }
+      saveCartToStorage(state)
     },
     clearCart: (state) => {
       state.items = []
       state.selectedItems = []
+      saveCartToStorage(state)
     },
     toggleItemSelection: (state, action: PayloadAction<string>) => {
       const productId = action.payload
@@ -80,18 +117,22 @@ const cartSlice = createSlice({
       } else {
         state.selectedItems.push(productId)
       }
+      saveCartToStorage(state)
     },
     selectAllItems: (state) => {
       state.selectedItems = state.items.map((item) => item.product._id)
+      saveCartToStorage(state)
     },
     deselectAllItems: (state) => {
       state.selectedItems = []
+      saveCartToStorage(state)
     },
     removeSelectedItems: (state) => {
       state.items = state.items.filter(
         (item) => !state.selectedItems.includes(item.product._id)
       )
       state.selectedItems = []
+      saveCartToStorage(state)
     },
   },
 })
