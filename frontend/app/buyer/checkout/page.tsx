@@ -132,11 +132,19 @@ export default function CheckoutPage() {
         product: item.product._id,
         quantity: item.quantity,
       }))
-      const result = await createOrder({
+      
+      // Add timeout wrapper to prevent infinite loading
+      const orderPromise = createOrder({
         items: orderItems,
         shippingAddress: data.shippingAddress,
         paymentMethod: data.paymentMethod,
       }).unwrap()
+      
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout. Please check your connection and try again.')), 35000)
+      })
+      
+      const result = await Promise.race([orderPromise, timeoutPromise]) as any
 
       if (result.success && result.data?.order?._id) {
         // Remove only ordered items from cart (not all items)
@@ -151,7 +159,9 @@ export default function CheckoutPage() {
         showToast('Order placed but received unexpected response', 'error')
       }
     } catch (error: any) {
-      showToast(error?.data?.message || 'Failed to create order', 'error')
+      const errorMessage = error?.data?.message || error?.message || 'Failed to create order. Please try again.'
+      showToast(errorMessage, 'error')
+      console.error('Order creation error:', error)
     }
   }
 

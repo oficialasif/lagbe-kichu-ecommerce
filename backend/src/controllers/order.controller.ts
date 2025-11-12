@@ -83,38 +83,39 @@ export const createOrder = async (
       .populate('buyer', 'name email phone')
       .populate('items.product', 'title images price');
 
-    try {
-      if (populatedOrder && populatedOrder.buyer && typeof populatedOrder.buyer === 'object' && 'email' in populatedOrder.buyer) {
-        const buyer = populatedOrder.buyer as any;
-        const orderItems = populatedOrder.items.map((item: any) => ({
-          title: item.product?.title || 'Product',
-          quantity: item.quantity,
-          price: item.price,
-        }));
-
-        // Send email notification
-        await sendOrderConfirmationEmail(
-          buyer.email,
-          buyer.name || 'Customer',
-          populatedOrder.orderNumber || '',
-          {
-            totalAmount: populatedOrder.totalAmount,
-            items: orderItems,
-            shippingAddress: populatedOrder.shippingAddress,
-            paymentMethod: populatedOrder.paymentMethod,
-          }
-        );
-      }
-    } catch (emailError: any) {
-      const { logger } = await import('../utils/logger');
-      logger.error('Failed to send order confirmation email:', emailError.message);
-    }
-
+    // Send response immediately, don't wait for email
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
       data: { order: populatedOrder },
     });
+
+    // Send email notification asynchronously (fire-and-forget)
+    // This prevents email issues from blocking the order response
+    if (populatedOrder && populatedOrder.buyer && typeof populatedOrder.buyer === 'object' && 'email' in populatedOrder.buyer) {
+      const buyer = populatedOrder.buyer as any;
+      const orderItems = populatedOrder.items.map((item: any) => ({
+        title: item.product?.title || 'Product',
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      // Send email in background, don't await
+      sendOrderConfirmationEmail(
+        buyer.email,
+        buyer.name || 'Customer',
+        populatedOrder.orderNumber || '',
+        {
+          totalAmount: populatedOrder.totalAmount,
+          items: orderItems,
+          shippingAddress: populatedOrder.shippingAddress,
+          paymentMethod: populatedOrder.paymentMethod,
+        }
+      ).catch((emailError: any) => {
+        const { logger } = require('../utils/logger');
+        logger.error('Failed to send order confirmation email:', emailError.message);
+      });
+    }
   } catch (error: any) {
     if (error.name === 'ZodError') {
       return next(createError(error.errors[0].message, 400));

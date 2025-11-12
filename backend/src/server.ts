@@ -103,6 +103,22 @@ mongoose.connection.on('error', (err) => {
   logger.error('MongoDB error:', err);
 });
 
+// Validate email configuration at startup
+const validateEmailConfig = () => {
+  const emailHost = process.env.EMAIL_HOST;
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  
+  if (!emailHost || !emailUser || !emailPass) {
+    logger.warn('⚠️  Email configuration is missing. Order confirmation emails will not be sent.');
+    logger.warn('   Please set EMAIL_HOST, EMAIL_USER, and EMAIL_PASS environment variables.');
+  } else {
+    logger.info('✅ Email configuration found. Order confirmation emails will be sent.');
+  }
+};
+
+validateEmailConfig();
+
 app.get('/', (req, res) => {
   res.json({ 
     success: true, 

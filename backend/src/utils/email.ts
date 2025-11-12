@@ -15,6 +15,10 @@ const createTransporter = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    // Add timeout to prevent hanging
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 };
 
@@ -39,13 +43,13 @@ interface EmailOptions {
 }
 
 /**
- * Send email using Nodemailer
+ * Send email using Nodemailer with timeout
  */
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   try {
     const transporter = getTransporter();
     if (!transporter) {
-      console.error('Email transporter not configured. Please set EMAIL_HOST, EMAIL_USER, and EMAIL_PASS in .env');
+      logger.warn('Email transporter not configured. Please set EMAIL_HOST, EMAIL_USER, and EMAIL_PASS in .env');
       return false;
     }
 
@@ -57,11 +61,17 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
       html: options.html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully:', info.messageId);
+    // Add timeout wrapper to prevent hanging
+    const emailPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Email sending timeout after 15 seconds')), 15000);
+    });
+
+    const info = await Promise.race([emailPromise, timeoutPromise]) as any;
+    logger.info('✅ Email sent successfully:', info.messageId);
     return true;
   } catch (error: any) {
-    console.error('❌ Email sending failed:', error.message);
+    logger.error('❌ Email sending failed:', error.message);
     return false;
   }
 };

@@ -4,6 +4,8 @@ import Cookies from 'js-cookie'
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   credentials: 'include',
+  // Add timeout to prevent hanging requests (30 seconds)
+  timeout: 30000,
   prepareHeaders: (headers) => {
     const token = Cookies.get('accessToken')
     if (token) {
